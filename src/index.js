@@ -437,7 +437,8 @@ export default class App extends React.Component {
                     description='fatigue description'
                   />
                 </Card>
-
+                
+                <button onClick={this.handleSaveToPC.bind(this)}>download</button>
               </Col>
 
             </Row>
@@ -525,8 +526,11 @@ export default class App extends React.Component {
                 value={this.state.rateValueFatigue}
                 character={({ index }) => customIcons[index + 1]} allowHalf
               />
+              
 
             </Form.Item>
+
+            
 
             <Form.Item
               label="Add a comment:"
