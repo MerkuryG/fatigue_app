@@ -77,7 +77,23 @@ export default class App extends React.Component {
     this.setState({ rateValueFatigue: val })
   }
 
+  handleSaveToPC() {
+    const fileData = JSON.stringify(this.state);
+    const blob = new Blob([fileData], {type: "text/plain"});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = 'filename.json';
+    link.href = url;
+    link.click();
+  }
 
+  handleLoadToPC(){
+    fetch('./data/filename.json')
+    .then((res) => res.json())
+    .then((loadedData) => {
+      this.setState({loadedData : loadedData})
+    })
+  }
 
   Item(details) {
     return (
@@ -133,6 +149,40 @@ export default class App extends React.Component {
       5: <FireOutlined/>,
     }
 
+    let optionCalendar = {
+      title: {
+        top: 30,
+        left: 'center',
+        text: 'Fatigue Index'
+      },
+      tooltip: {},
+      visualMap: {
+        min: 1,
+        max: 5,
+        type: 'piecewise',
+        orient: 'horizontal',
+        left: 'center',
+        top: 65
+      },
+      calendar: {
+        top: 120,
+        left: 30,
+        right: 30,
+        cellSize: ['auto', 13],
+        range: '2022',
+        itemStyle: {
+          borderWidth: 0.5
+        },
+        yearLabel: { show: false }
+      },
+      series: {
+        name: 'Fatigue rating calendar',
+        type: 'heatmap',
+        coordinateSystem: 'calendar',
+        data: [1,4,3,2,4,5,3,4,1,2,3,3,4,4,5,5,5]
+      }
+    };
+
     let option = {
       title: {
         text: 'Stacked Line'
@@ -167,7 +217,7 @@ export default class App extends React.Component {
           name: 'Water intake',
           type: 'line',
           stack: 'Total',
-          data: [10, 12, 11, 8, 15, 13, 12]
+          data: this.state.loadedData?.waterCount 
         },
         {
           name: 'Coffee intake',
@@ -398,6 +448,7 @@ export default class App extends React.Component {
           <Card>
             <EChartsReact option={option} notMerge={true} />
             <EChartsReact option={option2} notMerge={true} />
+            <EChartsReact option={optionCalendar} notMerge={true} />
           </Card>
 
 
