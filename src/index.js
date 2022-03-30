@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Divider, Card, Button, InputNumber, Menu, Row, Avatar, Col, Modal, Rate } from 'antd';
-import { PlusCircleOutlined, MinusCircleOutlined, LineChartOutlined, AppstoreOutlined, FrownOutlined, MehOutlined,SmileOutlined } from '@ant-design/icons';
+import { Space, Card, Button, InputNumber, Menu, Row, Avatar, Col, Modal, Rate } from 'antd';
+import { PlusCircleOutlined, MinusCircleOutlined, LineChartOutlined, AppstoreOutlined, FrownOutlined, MehOutlined, SmileOutlined } from '@ant-design/icons';
 import 'antd/dist/antd.css';
+import ReactECharts from 'echarts-for-react';
+import EChartsReact from 'echarts-for-react';
 
 const { Meta } = Card;
-
 
 
 export default class App extends React.Component {
@@ -17,7 +18,7 @@ export default class App extends React.Component {
     sleepVisible: 0,
     fatigueVisible: 0,
     rateValue: 3,
-    rateValueFatigue: 3,
+    rateValueFatigue: 2,
   };
 
   handleClick = e => {
@@ -60,7 +61,7 @@ export default class App extends React.Component {
     this.setState({ rateValueFatigue: val })
   }
 
-  
+
 
   Item(details) {
     return (
@@ -103,11 +104,72 @@ export default class App extends React.Component {
     let desc = ['terrible', 'bad', 'normal', 'good', 'wonderful']
     const customIcons = {
       1: <FrownOutlined />,
-      2: <FrownOutlined />,
-      3: <MehOutlined />,
-      4: <SmileOutlined />,
-      5: <SmileOutlined />,
+      2: <MehOutlined />,
+      3: <SmileOutlined />,
     };
+
+    let option = {
+      title: {
+        text: 'Stacked Line'
+      },
+      tooltip: {
+        trigger: 'axis'
+      },
+      legend: {
+        data: ['Water intake', 'Coffee intake', 'Alcohol intake', 'Sleep rating', 'Fatigue rating']
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+      },
+      toolbox: {
+        feature: {
+          saveAsImage: {}
+        }
+      },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+      },
+      yAxis: {
+        type: 'value'
+      },
+      series: [
+        {
+          name: 'Water intake',
+          type: 'line',
+          stack: 'Total',
+          data: [10, 12, 11, 8, 15, 13, 12]
+        },
+        {
+          name: 'Coffee intake',
+          type: 'line',
+          stack: 'Total',
+          data: [2, 1, 3, 2, 0, 1, 2]
+        },
+        {
+          name: 'Alcohol intake',
+          type: 'line',
+          stack: 'Total',
+          data: [0, 2, 0, 0, 5, 0, 1]
+        },
+        {
+          name: 'Sleep rating',
+          type: 'line',
+          stack: 'Total',
+          data: [3, 4, 3, 5, 2, 1, 4]
+        },
+        {
+          name: 'Fatigue rating',
+          type: 'line',
+          stack: 'Total',
+          data: [3, 2, 4, 1, 3, 4, 5]
+        }
+      ]
+    }
 
     return (
       <div className="site-card-wrapper">
@@ -189,34 +251,32 @@ export default class App extends React.Component {
 
               <Col span={6} >
 
-                  <Card
-                    style={{ width: 300 }}
+                <Card
+                  style={{ width: 300 }}
 
-                    actions={[
-                      <Button type="primary" onClick={this.onRateFatigue.bind(this)}>
-                        Rate your fatigue </Button>,
-                    ]}>
-                    <Meta
+                  actions={[
+                    <Button type="primary" onClick={this.onRateFatigue.bind(this)}>
+                      Rate your fatigue </Button>,
+                  ]}>
+                  <Meta
 
-                      avatar={<Avatar src="https://raw.githubusercontent.com/MerkuryG/fatigue_app/main/fatigue.png" />}
-                      title='fatigue data'
-                      description='fatigue description'
-                    />
-                  </Card>
+                    avatar={<Avatar src="https://raw.githubusercontent.com/MerkuryG/fatigue_app/main/fatigue.png" />}
+                    title='fatigue data'
+                    description='fatigue description'
+                  />
+                </Card>
 
-                </Col>
+              </Col>
 
             </Row>
 
           </div>
 
           :
-          <Row gutter={16}>
-            <Card>
-              <h1>page 2</h1>
-              <Divider />
-            </Card>
-          </Row>
+          <Card>
+            <EChartsReact option={option} notMerge={true} />
+          </Card>
+
 
         }
 
@@ -225,27 +285,29 @@ export default class App extends React.Component {
           visible={this.state.sleepVisible}
           onOk={() => this.setState({ sleepVisible: 0 })}
           onCancel={() => this.setState({ sleepVisible: 0 })}>
-          <span>
-            <Rate tooltips={desc} 
-            onChange={this.handleChangeSleepRating.bind(this)} 
-            value={this.state.rateValue} />
-            {this.state.rateValue ? <span className="ant-rate-text">{desc[this.state.rateValue - 1]}</span> : ''}
-          </span>
-          
+          <Space direction="vertical">
+            <InputNumber prefix="hours" />
+            <Rate tooltips={desc}
+              onChange={this.handleChangeSleepRating.bind(this)}
+              value={this.state.rateValue} />
+          </Space>
+          {this.state.rateValue ? <span className="ant-rate-text">{desc[this.state.rateValue - 1]}</span> : ''}
+
+
         </Modal>
 
         <Modal title="Basic Modal"
           visible={this.state.fatigueVisible}
           onOk={() => this.setState({ fatigueVisible: 0 })}
           onCancel={() => this.setState({ fatigueVisible: 0 })}>
-          <Rate onChange={this.handleChangeFatigueRating.bind(this)} 
-          value={this.state.rateValueFatigue} 
-          character={({ index }) => customIcons[index + 1]} 
+          <Rate onChange={this.handleChangeFatigueRating.bind(this)}
+            value={this.state.rateValueFatigue}
+            character={({ index }) => customIcons[index + 1]} allowHalf
           />
 
         </Modal>
 
-        
+
       </div>
     );
   }
