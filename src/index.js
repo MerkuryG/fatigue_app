@@ -128,6 +128,39 @@ export default class App extends React.Component {
       3: <SmileOutlined />,
     };
 
+    let optionCalendar = {
+      title: {
+        top: 30,
+        left: 'center',
+        text: 'Fatigue Index'
+      },
+      tooltip: {},
+      visualMap: {
+        min: 1,
+        max: 5,
+        type: 'piecewise',
+        orient: 'horizontal',
+        left: 'center',
+        top: 65
+      },
+      calendar: {
+        top: 120,
+        left: 30,
+        right: 30,
+        cellSize: ['auto', 13],
+        range: '2022',
+        itemStyle: {
+          borderWidth: 0.5
+        },
+        yearLabel: { show: false }
+      },
+      series: {
+        type: 'heatmap',
+        coordinateSystem: 'calendar',
+        data: [1,4,3,2,4,5,3,4,1,2,3,3,4,4,5,5,5]
+      }
+    };
+
     let option = {
       title: {
         text: 'Stacked Line'
@@ -162,31 +195,31 @@ export default class App extends React.Component {
           name: 'Water intake',
           type: 'line',
           stack: 'Total',
-          data: this.state.loadedData?.coffeeCount 
+          data: this.state.loadedData?.waterCount 
         },
         {
           name: 'Coffee intake',
           type: 'line',
           stack: 'Total',
-          data: [2, 1, 3, 2, 0, 1, 2]
+          data: [1,2,5,2,3,4,5]
         },
         {
           name: 'Alcohol intake',
           type: 'line',
           stack: 'Total',
-          data: [0, 2, 0, 0, 5, 0, 1]
+          data: this.state.loadedData?.alcoholCount
         },
         {
           name: 'Sleep rating',
           type: 'line',
           stack: 'Total',
-          data: [3, 4, 3, 5, 2, 1, 4]
+          data: this.state.loadedData?.onRateSleep
         },
         {
           name: 'Fatigue rating',
           type: 'line',
           stack: 'Total',
-          data: [3, 2, 4, 1, 3, 4, 5]
+          data: this.state.loadedData?.rateValueFatigue
         }
       ]
     }
@@ -295,6 +328,7 @@ export default class App extends React.Component {
           :
           <Card>
             <EChartsReact option={option} notMerge={true} />
+            <EChartsReact option={optionCalendar} notMerge={true} />
           </Card>
 
 
