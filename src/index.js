@@ -10,6 +10,7 @@ const { Meta } = Card;
 
 
 export default class App extends React.Component {
+
   state = {
     current: 'one',
     coffeeCount: 0,
@@ -19,6 +20,7 @@ export default class App extends React.Component {
     fatigueVisible: 0,
     rateValue: 3,
     rateValueFatigue: 2,
+    loadedData: [],
   };
 
   handleClick = e => {
@@ -59,6 +61,24 @@ export default class App extends React.Component {
 
   handleChangeFatigueRating(val) {
     this.setState({ rateValueFatigue: val })
+  }
+
+  handleSaveToPC() {
+    const fileData = JSON.stringify(this.state);
+    const blob = new Blob([fileData], {type: "text/plain"});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = 'filename.json';
+    link.href = url;
+    link.click();
+  }
+
+  handleLoadToPC(){
+    fetch('./data/filename.json')
+    .then((res) => res.json())
+    .then((loadedData) => {
+      this.setState({loadedData : loadedData})
+    })
   }
 
 
@@ -142,7 +162,7 @@ export default class App extends React.Component {
           name: 'Water intake',
           type: 'line',
           stack: 'Total',
-          data: [10, 12, 11, 8, 15, 13, 12]
+          data: this.state.loadedData?.coffeeCount 
         },
         {
           name: 'Coffee intake',
@@ -267,7 +287,7 @@ export default class App extends React.Component {
                 </Card>
 
               </Col>
-
+              <button onClick={this.handleSaveToPC.bind(this)}>download</button>
             </Row>
 
           </div>
