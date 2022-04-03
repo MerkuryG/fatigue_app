@@ -1,26 +1,36 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Space, Card, Button, InputNumber, Menu, Row, Avatar, Col, Modal, Rate } from 'antd';
-import { PlusCircleOutlined, MinusCircleOutlined, LineChartOutlined, AppstoreOutlined, FrownOutlined, MehOutlined, SmileOutlined } from '@ant-design/icons';
+import { Space, Card, Button, InputNumber, Menu, Row, Avatar, Col, Modal, Rate, Form, Input, Switch } from 'antd';
+import { PlusCircleOutlined, MinusCircleOutlined, LineChartOutlined, AppstoreOutlined, FrownOutlined, MehOutlined, SmileOutlined, FireOutlined } from '@ant-design/icons';
 import 'antd/dist/antd.css';
-import ReactECharts from 'echarts-for-react';
 import EChartsReact from 'echarts-for-react';
 
 const { Meta } = Card;
 
+let separator = '/'
+let newDate = new Date()
+let date = newDate.getDate();
+let month = newDate.getMonth() + 1;
+let year = newDate.getFullYear();
 
 export default class App extends React.Component {
-
   state = {
     current: 'one',
+    hadBreakfast:0,
     coffeeCount: 0,
     waterCount: 0,
     alcoholCount: 0,
     sleepVisible: 0,
     fatigueVisible: 0,
+    excerciseVisible: 0,
+    workVisible:0,
     rateValue: 3,
     rateValueFatigue: 2,
-    loadedData: [],
+    rateExcerciseIntensity: 2,
+    hoursSleep: 0,
+    hoursExcercise: 0,
+    hoursWork:0,
+    date: `${year}${separator}${month < 10 ? `0${month}` : `${month}`}${separator}${date}`
   };
 
   handleClick = e => {
@@ -55,6 +65,10 @@ export default class App extends React.Component {
     this.setState({ fatigueVisible: 1 })
   }
 
+  onAddExcercise() {
+    this.setState({ excerciseVisible: 1 })
+  }
+
   handleChangeSleepRating(val) {
     this.setState({ rateValue: val })
   }
@@ -80,8 +94,6 @@ export default class App extends React.Component {
       this.setState({loadedData : loadedData})
     })
   }
-
-
 
   Item(details) {
     return (
@@ -122,11 +134,20 @@ export default class App extends React.Component {
   render() {
     const current = this.state.current;
     let desc = ['terrible', 'bad', 'normal', 'good', 'wonderful']
+
     const customIcons = {
       1: <FrownOutlined />,
       2: <MehOutlined />,
       3: <SmileOutlined />,
     };
+
+    const customExcerciseIcons = {
+      1: <FireOutlined />,
+      2: <FireOutlined />,
+      3: <FireOutlined />,
+      4: <FireOutlined/>,
+      5: <FireOutlined/>,
+    }
 
     let optionCalendar = {
       title: {
@@ -155,6 +176,7 @@ export default class App extends React.Component {
         yearLabel: { show: false }
       },
       series: {
+        name: 'Fatigue rating calendar',
         type: 'heatmap',
         coordinateSystem: 'calendar',
         data: [1,4,3,2,4,5,3,4,1,2,3,3,4,4,5,5,5]
@@ -201,28 +223,50 @@ export default class App extends React.Component {
           name: 'Coffee intake',
           type: 'line',
           stack: 'Total',
-          data: [1,2,5,2,3,4,5]
+          data: [2, 1, 3, 2, 0, 1, 2]
         },
         {
           name: 'Alcohol intake',
           type: 'line',
           stack: 'Total',
-          data: this.state.loadedData?.alcoholCount
+          data: [0, 2, 0, 0, 5, 0, 1]
         },
         {
           name: 'Sleep rating',
           type: 'line',
           stack: 'Total',
-          data: this.state.loadedData?.onRateSleep
+          data: [3, 4, 3, 5, 2, 1, 4]
         },
         {
           name: 'Fatigue rating',
           type: 'line',
           stack: 'Total',
-          data: this.state.loadedData?.rateValueFatigue
+          data: [3, 2, 4, 1, 3, 4, 5]
         }
       ]
     }
+
+    let option2 = {
+      tooltip: {
+        trigger: 'axis'
+      },
+      xAxis: {
+        type: 'category',
+        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+      },
+      yAxis: {
+        type: 'value'
+      },
+      series: [
+        {
+          data: [820, 932, 901, 934, 1290, 1330, 1320],
+          type: 'line',
+          smooth: true
+        }
+      ]
+    };
+
+    console.log(this.state.hadBreakfast)
 
     return (
       <div className="site-card-wrapper">
@@ -238,7 +282,7 @@ export default class App extends React.Component {
 
         {current === 'one' ?
           <div>
-            <Row gutter={[16, 16]} justify="space-around">
+            <Row gutter={[16, 16]} justify="space-around" align="middle">
               <Col span={6} >
 
 
@@ -283,6 +327,8 @@ export default class App extends React.Component {
 
               </Col>
 
+              
+
               <Col span={6}>
 
                 <Card
@@ -297,6 +343,79 @@ export default class App extends React.Component {
                     avatar={<Avatar src="https://raw.githubusercontent.com/MerkuryG/fatigue_app/main/sleep.png" />}
                     title='Sleep data'
                     description='sleep description'
+                  />
+                </Card>
+
+              </Col>
+
+              <Col span={6}>
+
+                <Card
+                  style={{ width: 300 }}
+
+                  actions={[
+                    <Button type="primary" onClick={()=>{this.setState({workVisible: 1})}}>
+                      Register your work </Button>,
+                  ]}>
+                  <Meta
+
+                    avatar={<Avatar src="https://raw.githubusercontent.com/MerkuryG/fatigue_app/main/work.png" />}
+                    title='Work data'
+                    description='work description'
+                  />
+                </Card>
+
+              </Col>
+
+              <Col span={6} >
+
+                <Card
+                  style={{ width: 300 }}
+
+                  actions={[
+                    <Button type="primary" onClick={this.onAddExcercise.bind(this)}>
+                      Add excercise </Button>,
+                  ]}>
+                  <Meta
+
+                    avatar={<Avatar src="https://raw.githubusercontent.com/MerkuryG/fatigue_app/main/excercise.png" />}
+                    title='Excercise data'
+                    description='Excercise description'
+                  />
+                </Card>
+
+              </Col>
+
+              <Col span={6} >
+
+                <Card
+                  style={{ width: 300 }}
+
+                  actions={[
+                    <Switch onChange={(checked)=>this.setState({hadBreakfast : checked})} />,
+                  ]}>
+                  <Meta
+
+                    avatar={<Avatar src="https://raw.githubusercontent.com/MerkuryG/fatigue_app/main/breakfast.png" />}
+                    title='Breakfast'
+                    description='Breakfast description'
+                  />
+                </Card>
+
+              </Col>
+
+              <Col span={6} >
+
+                <Card
+                  style={{ width: 300 }}
+
+                  actions={[
+                  ]}>
+                  <Meta
+
+                    avatar={<Avatar src="https://raw.githubusercontent.com/MerkuryG/fatigue_app/main/stress.png" />}
+                    title='Stress'
+                    description='stress description'
                   />
                 </Card>
 
@@ -318,9 +437,10 @@ export default class App extends React.Component {
                     description='fatigue description'
                   />
                 </Card>
-
+                
+                <button onClick={this.handleSaveToPC.bind(this)}>download</button>
               </Col>
-              <button onClick={this.handleSaveToPC.bind(this)}>download</button>
+
             </Row>
 
           </div>
@@ -328,6 +448,7 @@ export default class App extends React.Component {
           :
           <Card>
             <EChartsReact option={option} notMerge={true} />
+            <EChartsReact option={option2} notMerge={true} />
             <EChartsReact option={optionCalendar} notMerge={true} />
           </Card>
 
@@ -335,29 +456,164 @@ export default class App extends React.Component {
         }
 
 
-        <Modal title="Basic Modal"
+        <Modal title="Sleep"
           visible={this.state.sleepVisible}
           onOk={() => this.setState({ sleepVisible: 0 })}
           onCancel={() => this.setState({ sleepVisible: 0 })}>
-          <Space direction="vertical">
-            <InputNumber prefix="hours" />
-            <Rate tooltips={desc}
-              onChange={this.handleChangeSleepRating.bind(this)}
-              value={this.state.rateValue} />
-          </Space>
-          {this.state.rateValue ? <span className="ant-rate-text">{desc[this.state.rateValue - 1]}</span> : ''}
 
+          <Form
+            name="basic"
+            labelCol={{
+              span: 8,
+            }}
+            wrapperCol={{
+              span: 16,
+            }}
+            initialValues={{
+              remember: true,
+            }}
+            autoComplete="off"
+          >
+
+            <Form.Item
+              label="Hours of sleep"
+            >
+
+              <InputNumber
+                onChange={(value) => this.setState({ hoursSleep: value })} />
+
+            </Form.Item>
+
+            <Form.Item
+              label="Rate your sleep"
+            >
+
+              <Rate tooltips={desc}
+                onChange={this.handleChangeSleepRating.bind(this)}
+                value={this.state.rateValue} allowHalf />
+
+
+            </Form.Item>
+
+          </Form>
 
         </Modal>
 
-        <Modal title="Basic Modal"
+        <Modal title="Fatigue"
           visible={this.state.fatigueVisible}
           onOk={() => this.setState({ fatigueVisible: 0 })}
           onCancel={() => this.setState({ fatigueVisible: 0 })}>
-          <Rate onChange={this.handleChangeFatigueRating.bind(this)}
-            value={this.state.rateValueFatigue}
-            character={({ index }) => customIcons[index + 1]} allowHalf
-          />
+
+          <Form
+            name="basic"
+            labelCol={{
+              span: 8,
+            }}
+            wrapperCol={{
+              span: 16,
+            }}
+            initialValues={{
+              remember: true,
+            }}
+            autoComplete="off"
+          >
+
+            <Form.Item
+              label="Rate your tiredness:"
+            >
+
+              <Rate onChange={this.handleChangeFatigueRating.bind(this)}
+                value={this.state.rateValueFatigue}
+                character={({ index }) => customIcons[index + 1]} allowHalf
+              />
+              
+
+            </Form.Item>
+
+            
+
+            <Form.Item
+              label="Add a comment:"
+            >
+              <Input.TextArea />
+
+            </Form.Item>
+
+          </Form>
+
+        </Modal>
+
+        <Modal title="Excercise Modal"
+          visible={this.state.excerciseVisible}
+          onOk={() => this.setState({ excerciseVisible: 0 })}
+          onCancel={() => this.setState({ excerciseVisible: 0 })}>
+          <Form
+            name="basic"
+            labelCol={{
+              span: 8,
+            }}
+            wrapperCol={{
+              span: 16,
+            }}
+            initialValues={{
+              remember: true,
+            }}
+            autoComplete="off"
+          >
+
+            <Form.Item
+              label="Hours of excercise"
+            >
+
+              <InputNumber
+                onChange={(value) => this.setState({ hoursExcercise: value })} />
+
+            </Form.Item>
+
+            <Form.Item
+              label="Rate excercise intesity"
+            >
+
+              <Rate
+                onChange={(val) => { this.setState({ rateExcerciseIntensity: val }) }}
+                value={this.state.rateExcerciseIntensity} allowHalf 
+                character={({ index }) => customExcerciseIcons[index + 1]}/>
+
+            </Form.Item>
+
+          </Form>
+
+        </Modal>
+
+
+        <Modal title="Work Modal"
+          visible={this.state.workVisible}
+          onOk={() => this.setState({ workVisible: 0 })}
+          onCancel={() => this.setState({ workVisible: 0 })}>
+          <Form
+            name="basic"
+            labelCol={{
+              span: 8,
+            }}
+            wrapperCol={{
+              span: 16,
+            }}
+            initialValues={{
+              remember: true,
+            }}
+            autoComplete="off"
+          >
+
+            <Form.Item
+              label="Hours of work"
+            >
+
+              <InputNumber
+                onChange={(value) => this.setState({ hoursWork: value })} />
+
+            </Form.Item>
+
+          </Form>
 
         </Modal>
 
